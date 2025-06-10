@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "nepal-palika-finder"
+version = "1.0.0"
+description = "A fast Python tool to find the Nepali Gaupalika or Nagarpalika for a given lat/lon coordinate using an optimized FlatGeobuf file."
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "nepal_palika_finder", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+shapely = "^2.0.4"
+fiona = "^1.9.6"
+pyyaml = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
