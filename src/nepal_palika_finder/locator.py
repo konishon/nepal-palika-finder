@@ -27,6 +27,9 @@ class PalikaLocator:
     def find_palika(self, latitude: float, longitude: float):
         """
         Finds the Gaupalika/Nagarpalika feature that contains the given coordinates.
+
+        Returns:
+            dict: The full feature dictionary from the underlying data source, or None.
         """
         point = Point(longitude, latitude)
         possible_matches_indices = self.tree.query(point)
@@ -35,5 +38,25 @@ class PalikaLocator:
             candidate_geometry = shape(self.features[idx]['geometry'])
             if candidate_geometry.contains(point):
                 return self.features[idx]
+
+        return None
+
+    def get_palika_geometry(self, latitude: float, longitude: float):
+        """
+        Finds the Gaupalika/Nagarpalika for the given coordinates and returns its
+        geometry as a GeoJSON dictionary.
+
+        Args:
+            latitude (float): The latitude of the point.
+            longitude (float): The longitude of the point.
+
+        Returns:
+            dict: A GeoJSON dictionary representing the geometry of the found Palika,
+                  or None if no Palika is found.
+        """
+        containing_feature = self.find_palika(latitude, longitude)
+
+        if containing_feature and 'geometry' in containing_feature:
+            return containing_feature['geometry']
 
         return None

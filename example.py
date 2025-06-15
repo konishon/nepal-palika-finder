@@ -1,4 +1,5 @@
 from src.nepal_palika_finder.locator import PalikaLocator
+import json
 
 def run_query_example():
     """
@@ -36,6 +37,22 @@ def run_query_example():
             print(f"  ✅  Result: Found in {palika_name}, {district_name} District.")
         else:
             print("  ❌  Result: Point is not within any Gaupalika/Nagarpalika in the dataset.")
+
+    # --- Step 3: Get Geometry as GeoJSON ---
+    print("\n\n--- Testing geometry retrieval as GeoJSON ---")
+    
+    biratnagar_coords = {"lat": 26.4525, "lon": 87.2718}
+    print(f"\nQuerying for geometry of: Biratnagar (Lat: {biratnagar_coords['lat']}, Lon: {biratnagar_coords['lon']})")
+
+    geometry_geojson = locator.get_palika_geometry(latitude=biratnagar_coords["lat"], longitude=biratnagar_coords["lon"])
+
+    if geometry_geojson:
+        print(f"  ✅  Result: Found geometry. Type: {geometry_geojson.get('type')}")
+        # To avoid printing a massive object, let's just show a snippet.
+        geometry_str = json.dumps(geometry_geojson)
+        print(f"     GeoJSON (first 100 chars): {geometry_str[:100]}...")
+    else:
+        print("  ❌  Result: Geometry not found for the given point.")
 
 
 if __name__ == "__main__":
