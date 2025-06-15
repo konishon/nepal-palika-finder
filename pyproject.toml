@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nepal-palika-finder"
-version = "1.0.0"
+version = "1.0.1"
 description = "A fast Python tool to find the Nepali Gaupalika or Nagarpalika for a given lat/lon coordinate using an optimized FlatGeobuf file."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
