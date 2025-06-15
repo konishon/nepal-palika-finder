@@ -62,7 +62,7 @@ class PalikaLocator:
     def get_palika_geometry(self, latitude: float, longitude: float):
         """
         Finds the Gaupalika/Nagarpalika for the given coordinates and returns its
-        geometry as a GeoJSON dictionary.
+        geometry as a standard GeoJSON dictionary.
 
         Returns:
             dict: A GeoJSON dictionary representing the geometry of the found Palika,
@@ -71,7 +71,8 @@ class PalikaLocator:
         containing_feature = self.find_palika(latitude, longitude)
 
         if containing_feature and 'geometry' in containing_feature:
-            return containing_feature['geometry']
+            # Cast to dict to ensure JSON serializability
+            return dict(containing_feature['geometry'])
 
         return None
 
@@ -101,8 +102,9 @@ class PalikaLocator:
 
     def get_palika_geometry_by_name(self, palika_name: str, district_name: str = None):
         """
-        Finds a Palika by its exact name and returns its geometry. Since Palika names
-        can be duplicated across districts, providing a district name is recommended for accuracy.
+        Finds a Palika by its exact name and returns its geometry as a standard
+        GeoJSON dictionary. Since Palika names can be duplicated across districts,
+        providing a district name is recommended for accuracy.
 
         Args:
             palika_name (str): The exact, case-insensitive name of the Palika.
@@ -129,10 +131,11 @@ class PalikaLocator:
 
         if len(candidates) == 1:
             feature_index = candidates[0]['feature_index']
-            return self.features[feature_index]['geometry']
+            # Cast to dict to ensure JSON serializability
+            return dict(self.features[feature_index]['geometry'])
         
         if len(candidates) > 1:
-            districts = [c['original_properties'].get('DISTRICT') for c in candidates]
+            districts = sorted([c['original_properties'].get('DISTRICT') or c['original_properties'].get('District') for c in candidates])
             warnings.warn(
                 f"Ambiguous Palika name '{palika_name}'. "
                 f"Found in multiple districts: {districts}. "
