@@ -143,3 +143,31 @@ class PalikaLocator:
             )
 
         return None
+
+    def get_all_palikas(self, include_geometry: bool = False):
+        """
+        Returns a list of all Palikas in the dataset.
+
+        Args:
+            include_geometry (bool): If True, the full GeoJSON feature including the
+                                     geometry will be returned for each Palika.
+                                     Defaults to False, returning only properties.
+
+        Returns:
+            list[dict]: A list of dictionaries. Each dictionary is either a Palika's
+                        properties or its full feature dictionary (with serializable geometry).
+        """
+        results = []
+        for feature in self.features:
+            if include_geometry:
+                new_feature = {
+                    'type': 'Feature',
+                    'id': feature.get('id'),
+                    'properties': feature.get('properties'),
+                    'geometry': dict(feature['geometry']) if feature.get('geometry') else None
+                }
+                results.append(new_feature)
+            else:
+                # Return only the properties
+                results.append(feature['properties'])
+        return results

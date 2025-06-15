@@ -49,7 +49,6 @@ def run_query_example():
     if search_results:
         print(f"  ✅  Found {len(search_results)} results:")
         for props in search_results:
-            # FIX: Use fallback for palika name key to avoid 'N/A'
             palika = props.get('PALIKA') or props.get('GaPa_NaPa', 'N/A')
             district = props.get('DISTRICT') or props.get('District', 'N/A')
             print(f"    - {palika}, {district}")
@@ -59,8 +58,6 @@ def run_query_example():
     # --- Step 4: Get Geometry by Name ---
     print("\n\n--- Testing geometry retrieval by name ---")
     
-    # Example 1: Unique name
-    # FIX: Use the correct name 'Kathmandu' as found in the data, not 'Kathmandu Mahanagarpalika'
     palika_to_find = "Kathmandu"
     print(f"\nQuerying for geometry of: '{palika_to_find}'")
     geometry = locator.get_palika_geometry_by_name(palika_to_find)
@@ -69,25 +66,26 @@ def run_query_example():
     else:
         print(f"  ❌  Result: Could not find geometry for {palika_to_find}.")
         
-    # Example 2: Ambiguous name (requires district)
-    palika_to_find = "Bhimdatta" # This name exists in more than one district
-    district_to_find = "Kanchanpur"
-    print(f"\nQuerying for ambiguous name '{palika_to_find}' without district...")
-    # This is expected to show a warning and return None
-    with warnings.catch_warnings(record=True) as w:
-        geometry_ambiguous = locator.get_palika_geometry_by_name(palika_to_find)
-        if not geometry_ambiguous and len(w) > 0 and "Ambiguous" in str(w[-1].message):
-            print("  ✅  Result: As expected, returned None and raised an ambiguity warning.")
+    # --- Step 5: Get a list of all Palikas ---
+    print("\n\n--- Testing retrieval of all Palikas ---")
 
-    print(f"\nQuerying for '{palika_to_find}' with district '{district_to_find}'...")
-    geometry_specific = locator.get_palika_geometry_by_name(palika_to_find, district_name=district_to_find)
-    if geometry_specific:
-        # FIX: The geometry object is now a proper dict and can be serialized
-        geometry_str = json.dumps(geometry_specific)
-        print(f"  ✅  Result: Found specific geometry. Type: {geometry_specific.get('type')}")
-        print(f"     GeoJSON (first 100 chars): {geometry_str[:100]}...")
-    else:
-        print(f"  ❌  Result: Could not find geometry for {palika_to_find} in {district_to_find}.")
+    # Example 1: Get properties only (default)
+    all_palikas_properties = locator.get_all_palikas()
+    print(f"\nFound {len(all_palikas_properties)} Palikas (properties only).")
+    print("  ✅  Example of first 3:")
+    for props in all_palikas_properties[:3]:
+        palika = props.get('PALIKA') or props.get('GaPa_NaPa', 'N/A')
+        district = props.get('DISTRICT') or props.get('District', 'N/A')
+        print(f"    - {palika}, {district}")
+
+    # Example 2: Get full features with geometry
+    all_palikas_features = locator.get_all_palikas(include_geometry=True)
+    print(f"\nFound {len(all_palikas_features)} Palikas (with geometry).")
+    if all_palikas_features:
+        first_feature = all_palikas_features[0]
+        print(f"  ✅  Example of first feature keys: {list(first_feature.keys())}")
+        print(f"  ✅  It has properties: {first_feature.get('properties')}")
+        print(f"  ✅  And a geometry of type: '{first_feature.get('geometry', {}).get('type')}'")
 
 
 if __name__ == "__main__":
